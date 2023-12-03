@@ -121,17 +121,21 @@ exports.register = async(req,res) => {
      //store password
      
  
-     const agency = await agency.create({
-         name,
+     const Agency = await agency.create({
+         name:Name,
          email,
          password: hashedPassword,
-         accountType: accountType,
+         agencyType: agencyType,
+         contactNumber:1234567890,
+         lat:0,
+         lng:0,
+         address:'address',
      });
  
      return res.status(200).json({
          success:true,
          message:'agency created successfuly',
-         user
+         Agency
      })
  
  
@@ -141,6 +145,7 @@ exports.register = async(req,res) => {
      
  
      catch(err){
+        console.log(err);
          return res.status(500).json({
              success:false,
              message:'user cannot be registered',
