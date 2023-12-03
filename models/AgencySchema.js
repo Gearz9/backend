@@ -35,6 +35,10 @@ const agencySchema = {
   resources:{
     type: mongoose.Schema.Types.ObjectId,
     ref :'Resources',
+  },
+  contactNumber:{
+    type:Number,
+    required: true,
   }
 };
 
