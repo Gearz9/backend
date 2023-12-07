@@ -2,19 +2,17 @@ const mongoose = require("mongoose");
 
 const ResourcesSchema = {
   resource: {
-    name: {
+    name: [{
       type: String,
       required: true,
       trim: true,
-    },
-    quantity: {
+    }],
+    quantity: [{
       type: Number,
       required: true,
       min: 0,
-    },
+    }],
   },
-
-  
 
 };
 
