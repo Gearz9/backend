@@ -74,6 +74,9 @@ exports.register = async(req,res) => {
          confirmPassword,
          agencyType,
          contactNumber,
+         lat,
+         lng,
+         address,
          otp,
      } = req.body;
      if(!Name ||!email ||!password ||!confirmPassword ||!otp){
@@ -126,10 +129,10 @@ exports.register = async(req,res) => {
          email,
          password: hashedPassword,
          agencyType: agencyType,
-         contactNumber:1234567890,
-         lat:0,
-         lng:0,
-         address:'address',
+         contactNumber:contactNumber,
+         lat:lat,
+         lng:lng,
+         address:address,
      });
  
      return res.status(200).json({
@@ -154,3 +157,67 @@ exports.register = async(req,res) => {
      }
  
  }
+
+ exports.login = async(req,res) => {
+    try{
+        ///get data from req body
+        const {email,password} = req.body;
+
+        if(!email || !password){
+            return res.status(403).json({
+                success:false,
+                message:'All field are required',
+            })
+        }
+        //validation data
+        //user check exist or not
+        const Agency = await agency.findOne({email});
+        if(!Agency){
+            return res.status(401).json({
+                success:false,
+                message:'Agency is not registered',
+            })
+        }
+        //generate jwt token after password matches
+        if(await bcrypt.compare(password,Agency.password)){
+            const payload = {
+                email:Agency.email,
+                id:Agency._id,
+                accountType:Agency.accountType,
+            }
+            const token  = jwt.sign(payload,process.env.JWT_SECRET,{
+                expiresIn:'2h'
+            })
+            Agency.token = token;
+            Agency.password = undefined;
+
+            const options = {
+                expires:new Date(Date.now()+ 3*24*60*60*1000),
+                httpOnly:true,
+            }
+            res.cookie('token',token,options).status(200).json({
+                success:true,
+                token,
+                Agency,
+                message:'Logged in successfully',
+            })
+        }
+        else{
+            return res.status(401).json({
+                success:false,
+                message:'password is incorrect'
+            })
+        }
+        //create a cookie and send response
+    }
+    catch(err){
+        console.log(err);
+        return res.status(500).json({
+            success:false,
+            message:'Error while logging in',
+            error:err.message,
+            
+        })
+    }
+}
+
