@@ -3,6 +3,7 @@ const OTP  = require('../models/OTPSchema');
 const otpGenerator = require('otp-generator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { parse } = require('dotenv');
 // const Profile = require('../models/Profile');
 require('dotenv').config();
 
@@ -132,6 +133,10 @@ exports.register = async(req,res) => {
          contactNumber:contactNumber,
          lat:lat,
          lng:lng,
+         location:{
+            type:"Point",
+            coordinates:[parseFloat(lat),parseFloat(lng)]
+        },
          address:address,
      });
  
@@ -171,7 +176,7 @@ exports.register = async(req,res) => {
         }
         //validation data
         //user check exist or not
-        const Agency = await agency.findOne({email});
+        const Agency = await agency.findOne({email}).populate('resources');
         if(!Agency){
             return res.status(401).json({
                 success:false,
