@@ -1,27 +1,29 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-require('dotenv').config();
+require("dotenv").config();
 app.use(express.json());
-const database = require('./config/database');
+const database = require("./config/database");
+const cors = require("cors");
+const { createTransport } = require("nodemailer");
 
-
-
-
-
+app.use(
+  cors({
+    origin: "http://192.168.1.37:8081",
+    credentials: true,
+  })
+);
 
 const PORT = process.env.PORT || 4000;
 database.dbConnect();
 
+const userRoutes = require("./routes/Agency");
 
-
-
-const userRoutes = require('./routes/Agency');
-app.listen(PORT, () => {   
-    console.log(`Server is running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
-app.get('/', (req, res) => {
-    res.send('Hello World');
+app.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
-app.use('/api/v1/auth', userRoutes);
+app.use("/api/v1/auth", userRoutes);
