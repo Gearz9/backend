@@ -31,3 +31,4 @@ exports.getNearby = async (req, res) => {
     });
   }
 };
+
