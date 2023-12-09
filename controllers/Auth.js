@@ -4,6 +4,10 @@ const otpGenerator = require('otp-generator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { parse } = require('dotenv');
+const nodemailer = require("nodemailer");
+
+// Rest of your code using nodemailer
+
 // const Profile = require('../models/Profile');
 require('dotenv').config();
 
@@ -23,12 +27,16 @@ exports.sendOTP = async(req,res) => {
         })
     }
 
+    
+    
+      
     //generate otp
     var otp =  otpGenerator.generate(6,{
         upperCaseAlphabets:false,
         lowerCaseAlphabets:false,
         specialChars:false,
     })
+
 
     //check unique otp or not 
     var result = await OTP.findOne({otp:otp});
@@ -41,12 +49,28 @@ exports.sendOTP = async(req,res) => {
         });
          result = OTP.findOne({otp:otp});
     }
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.MAIL_ID, // Replace with your email
+          pass: process.env.MAIL_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: "surakshaservices100.1@gmail.com",
+        to: email,
+        subject: "Your OTP for Login",
+        text: `Your OTP is: ${otp}`,
+      };
+     
 
     const otpPayload = {
         email,otp
     }
     //create an entry in db for OTP 
     const otpBody = await OTP.create(otpPayload);
+    await transporter.sendMail(mailOptions);
 
     //return response Successfull 
     return res.status(200).json({
