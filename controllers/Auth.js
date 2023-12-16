@@ -102,9 +102,10 @@ exports.register = async(req,res) => {
          lat,
          lng,
          address,
-         otp,
      } = req.body;
-     if(!Name ||!email ||!password ||!confirmPassword ||!otp){
+     if(!Name ||!email ||!password ||!confirmPassword){
+        console.log(Name,email,password,confirmPassword)
+        console.log("All fields are required")
          return res.status(403).json({
              success:false,
              message:'All fields Are Required',
@@ -131,19 +132,7 @@ exports.register = async(req,res) => {
  
  
      //find most recent OTP stored for the agency
-     const recentOtp = await OTP.find({email}).sort({createdAt:-1}).limit(1);
-     if(recentOtp.length === 0){
-         return res.status(400).json({
-             success:false,
-             message:'Otp Not found',
-         })
-     }
-     else if(otp != recentOtp[0].otp){
-         return res.status(400).json({
-             success:false,
-             message:'Otp doesnt match',
-         })
-     }
+     
      //hash password 
      const hashedPassword = await bcrypt.hash(password,10);
      //store password
