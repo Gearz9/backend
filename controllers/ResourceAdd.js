@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const Agency = require("../models/Agency");
-const Resources = require("../models/Resources");
+const Agency = require("../models/AgencySchema");
+const Resources = require("../models/ResourcesSchema");
 
 exports.addResource = async (req, res) => {
  try {
