@@ -8,9 +8,10 @@ const { createTransport } = require("nodemailer");
 
 app.use(
   cors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    headers: 'Content-Type,Authorization',
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    headers: "Content-Type,Authorization",
+    credentials: true,
   })
 );
 
