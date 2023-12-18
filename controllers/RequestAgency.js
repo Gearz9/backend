@@ -64,6 +64,12 @@ exports.sendRequestToAgency = async (req, res) => {
       status,
     });
 
+    // Check if the status is 'Accepted' and update the requesting agency's status
+    if (status === 'Accepted') {
+      requestingAgency.status = 'Accepted';
+      await requestingAgency.save();
+    }
+
     await newRequest.save();
 
     return res.status(200).json({
