@@ -6,6 +6,7 @@ const Resources = require("../models/ResourcesSchema");
 exports.addResource = async (req, res) => {
  try {
     const { agencyId, resourceName, resourceQuantity } = req.body;
+    console.log(req.body);
 
     // Create a new Resources document
     const newResource = new Resources({
@@ -18,6 +19,12 @@ exports.addResource = async (req, res) => {
 
     // Find the agency by ID
     const agency = await Agency.findById(agencyId);
+    if(!agency){
+      return res.status(500).json({
+        success:false,
+        error:"Agency not found",
+      })
+    }
 
     // Add the _id of the new resource to the resources array of the agency
     agency.resources.push(newResource._id);
@@ -34,7 +41,7 @@ exports.addResource = async (req, res) => {
     console.error("Error adding resource to the agency:", error);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: error,
     });
   }
 }

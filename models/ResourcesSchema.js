@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const ResourcesSchema = {
-  resource: {
+  
     name: {
       type: String,
       required: true,
@@ -12,7 +12,7 @@ const ResourcesSchema = {
       required: true,
       min: 0,
     },
-  },
+  
 
 };
 
