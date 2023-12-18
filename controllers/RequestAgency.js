@@ -3,7 +3,7 @@ const Agency = require('../models/AgencySchema');
 
 exports.sendRequestToAgency = async (req, res) => {
   try {
-    const { selectedAgencyId, userId, lat, lng, resource ,status/*, other data */ } = req.body;
+    const { selectedAgencyId, userId, lat, lng, resource, status } = req.body;
 
     // Find the requesting agency
     const requestingAgency = await Agency.findById(userId);
@@ -23,6 +23,37 @@ exports.sendRequestToAgency = async (req, res) => {
       });
     }
 
+    // Check if the target agency has enough resources
+    const hasEnoughResources = resource.every(requestedResource => {
+      const availableResource = targetAgency.resources.find(
+        resource => resource.name === requestedResource.name
+      );
+      return (
+        availableResource &&
+        availableResource.quantity >= requestedResource.quantity
+      );
+    });
+
+    if (!hasEnoughResources) {
+      return res.status(400).json({
+        success: false,
+        message: 'Not enough resources available for the request',
+      });
+    }
+
+    // Update the target agency's resources
+    resource.forEach(requestedResource => {
+      const resourceIndex = targetAgency.resources.findIndex(
+        resource => resource.name === requestedResource.name
+      );
+      if (resourceIndex !== -1) {
+        targetAgency.resources[resourceIndex].quantity -= requestedResource.quantity;
+      }
+    });
+
+    // Save the updated target agency document
+    await targetAgency.save();
+
     // Create a new request document
     const newRequest = new Request({
       lat,
@@ -30,8 +61,7 @@ exports.sendRequestToAgency = async (req, res) => {
       to: targetAgency._id, // Set the target agency
       from: requestingAgency._id, // Set the requesting agency
       resource,
-      status
-      // Add other relevant data to the request document
+      status,
     });
 
     await newRequest.save();
