@@ -11,9 +11,8 @@ const ResourcesSchema = {
       type: Number,
       required: true,
       min: 0,
-    }],
+    }], 
   },
-
 };
 
 module.exports = mongoose.model("Resources", ResourcesSchema);
