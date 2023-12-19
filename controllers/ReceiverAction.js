@@ -86,7 +86,6 @@ exports.receiverAction = async (req, res) => {
         );
 
         if (resourceIndex !== -1) {
-          console.log("i am HERE ................. here");
           resources.quantity[resourceIndex] += request.resource.quantity[i];
         }
       }
@@ -119,7 +118,7 @@ exports.allRequests = async (req, res) => {
 
     // Use populate to get detailed information about the requesting agency and resources
     try {
-      const allRequests = await await Request.find({ to: agencyID })
+      const allRequests = await Request.find({ to: agencyID })
         .populate("to")
         .populate("from")
         .exec();
