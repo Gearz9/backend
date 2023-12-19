@@ -44,7 +44,7 @@ const RequestSchema = new mongoose.Schema(
     // Status of the Requests
     status: {
       type: String,
-      enum: ["Pending", "Accepted", "Rejected"],
+      enum: ["Pending", "Accepted", "Rejected" ,"Completed"],
       default: "Pending",
     },
   },
