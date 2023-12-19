@@ -43,15 +43,15 @@ exports.sendRequestToAgency = async (req, res) => {
     }
 
 
-    // Deduct the requested resources from the target agency
-    resource.forEach(requestedResource => {
-      const resourceIndex = targetAgency.resources.findIndex(
-        resource => resource.name === requestedResource.name
-      );
-      if (resourceIndex !== -1) {
-        targetAgency.resources[resourceIndex].quantity -= requestedResource.quantity;
-      }
-    });
+    // // Deduct the requested resources from the target agency
+    // resource.forEach(requestedResource => {
+    //   const resourceIndex = targetAgency.resources.findIndex(
+    //     resource => resource.name === requestedResource.name
+    //   );
+    //   if (resourceIndex !== -1) {
+    //     targetAgency.resources[resourceIndex].quantity -= requestedResource.quantity;
+    //   }
+    // });
 
 
     // Create a new request document

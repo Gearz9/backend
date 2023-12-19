@@ -41,11 +41,11 @@ const agencySchema = new mongoose.Schema({
     enum: ['Fire-Brigade', 'Hospital', 'Police', 'CRPF', 'NDRF', 'SRPF', 'Army'],
     required: true
   },
-    resources: [{
+    resources: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Resources',
     }
-  ],
+  ,
   contactNumber: {
     type: Number,
     required: true,
