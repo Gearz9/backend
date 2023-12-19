@@ -1,16 +1,16 @@
 const mongoose = require("mongoose");
 
 const ResourcesSchema = {
-    name: {
+    name: [{
       type: String,
       required: true,
       trim: true,
-    },
-    quantity: {
+    }],
+    quantity:[ {
       type: Number,
       required: true,
       min: 0,
-    },
+    }],
 };
 
 module.exports = mongoose.model("Resources", ResourcesSchema);

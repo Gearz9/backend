@@ -3,29 +3,29 @@ const mongoose = require("mongoose");
 const agencySchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
-    required: true
+    required: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   lat: {
     type: Number,
-    required: true
+    required: true,
   },
   lng: {
     type: Number,
-    required: true
+    required: true,
   },
   location: {
     type: {
       type: String,
-      enum: ['Point'],
-      default: 'Point',
+      enum: ["Point"],
+      default: "Point",
     },
     coordinates: {
       type: [Number],
@@ -34,18 +34,25 @@ const agencySchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    required: true
+    required: true,
   },
   agencyType: {
     type: String,
-    enum: ['Fire-Brigade', 'Hospital', 'Police', 'CRPF', 'NDRF', 'SRPF', 'Army'],
-    required: true
+    enum: [
+      "Fire-Brigade",
+      "Hospital",
+      "Police",
+      "CRPF",
+      "NDRF",
+      "SRPF",
+      "Army",
+    ],
+    required: true,
   },
-    resources: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Resources',
-    }
-  ,
+  resources: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Resources",
+  },
   contactNumber: {
     type: Number,
     required: true,
@@ -57,11 +64,11 @@ agencySchema.index({ location: "2dsphere" });
 
 const Agency = mongoose.model("Agency", agencySchema);
 
-Agency.on('index', (error) => {
+Agency.on("index", (error) => {
   if (error) {
-    console.error('Error creating index:', error);
+    console.error("Error creating index:", error);
   } else {
-    console.log('Index created successfully');
+    console.log("Index created successfully");
   }
 });
 
