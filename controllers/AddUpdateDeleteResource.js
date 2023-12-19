@@ -22,26 +22,20 @@ exports.addResource = async (req, res) => {
     if (!resourcesData) {
       resourcesData = new Resources();
       console.log(resourcesData);
+
+      await resourcesData.save();
+
+      // Update the agency's resources field
       agencyData.resources = resourcesData._id;
-      await Agency.findByIdAndUpdate(agencyId, agencyData);
+      await agencyData.save(); // Use save method to update the agencyData
     }
 
     console.log("resourceData", resourcesData);
 
     // finding resources object id
+    let resourcesObjectId = resourcesData._id;
 
-    let resourcesObjectId = agencyData.resources._id || resourcesData._id;
-    let resourcesObject = await Resources.findById(resourcesObjectId);
-
-    for (let i = 0; i < resourcesObject.name.length; i++) {
-      if (resourcesObject.name[i] === resourceName) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Resource already exists for this agency. Go for Updating Reourses Quantity Please",
-        });
-      }
-    }
+    const resourcesObject = await Resources.findById(resourcesObjectId);
 
     // Push the new resource into the array
     resourcesObject.name.push(resourceName);
@@ -53,7 +47,7 @@ exports.addResource = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Resource added to the agency successfully",
-      resource: resourcesData,
+      resources: resourcesObject,
     });
   } catch (error) {
     console.error("Error adding resource to the agency:", error);
@@ -88,12 +82,12 @@ exports.updateResource = async (req, res) => {
       });
     }
 
-    let resourcesObjectId = agencyData.resources._id;
-    let resourcesObject = await Resources.findById(resourcesObjectId);
+    let resourcesObjectId = agencyData.resources?._id;
+    let resourcesObject = await Resources?.findById(resourcesObjectId);
 
     // finding resources object id and updating it
 
-    for (let i = 0; i < resourcesObject.name.length; i++) {
+    for (let i = 0; i < resourcesObject?.name?.length; i++) {
       if (resourcesObject.name[i] === resourceName) {
         resourcesObject.quantity[i] += resourceQuantity;
 
@@ -128,8 +122,7 @@ exports.updateResource = async (req, res) => {
   }
 };
 
-
-exports.deleteResource = async(req,res)=>{
+exports.deleteResource = async (req, res) => {
   try {
     const { agencyId, resourceName, resourceQuantity } = req.body;
     const agencyData = await Agency.findById(agencyId);
@@ -160,10 +153,10 @@ exports.deleteResource = async(req,res)=>{
 
     for (let i = 0; i < resourcesObject.name.length; i++) {
       if (resourcesObject.name[i] === resourceName) {
-        
         return res.status(400).json({
           success: false,
-          message: "Resource already exists for this agency. Go for Updating Reourses Quantity Please",
+          message:
+            "Resource already exists for this agency. Go for Updating Reourses Quantity Please",
         });
       }
     }
@@ -171,7 +164,6 @@ exports.deleteResource = async(req,res)=>{
     // Push the new resource into the array
     resourcesObject.name.push(resourceName);
     resourcesObject.quantity.push(resourceQuantity);
-
 
     // Save the updated resources data
     await Resources.findByIdAndUpdate(resourcesObjectId, resourcesObject);
@@ -200,4 +192,4 @@ exports.deleteResource = async(req,res)=>{
       });
     }
   }
-}
+};
