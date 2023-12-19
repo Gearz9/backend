@@ -15,19 +15,22 @@ const {
   receiverPendingRequests,
   allRequests,
 } = require("../controllers/ReceiverAction");
+const { allRequestsSend, sendRequestToAgency } = require("../controllers/SendersAction");
 
 router.post("/sendOtp", sendOTP);
 router.post("/register", register);
 router.post("/login", login);
 router.post("/get-nearby", getNearby);
 router.post("/verifyOtp", verify);
-// router.post('/send-request', sendRequestToAgency);
+
+router.post("/all-requests-send", allRequestsSend);
+router.post("/send-request", sendRequestToAgency);
+
+// router.post('/sender-Action', senderAction);
 router.post("/receiver-pending-requests", receiverPendingRequests);
 router.post("/receiver-action", receiverAction);
 router.post("/receiver-all-requests", allRequests);
-
 router.post("/delete-resource", deleteResource);
-
 router.post("/add-resource", addResource);
 router.post("/update-resource", updateResource);
 router.get("/testing/getAllAgencies", getAllAgencies);

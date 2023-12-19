@@ -1,6 +1,10 @@
 // controllers/requestController.js
-const Request = require('../models/RequestSchema');
-const Agency = require('../models/AgencySchema');
+const Request = require("../models/RequestSchema");
+const Agency = require("../models/AgencySchema");
+const Resources = require("../models/ResourcesSchema");
+
+
+// Assuming you have the necessary imports for Agency, Resources, and Request
 
 exports.sendRequestToAgency = async (req, res) => {
   try {
@@ -11,7 +15,7 @@ exports.sendRequestToAgency = async (req, res) => {
     if (!requestingAgency) {
       return res.status(404).json({
         success: false,
-        message: 'Requesting agency not found',
+        message: "Requesting agency not found",
       });
     }
 
@@ -20,39 +24,33 @@ exports.sendRequestToAgency = async (req, res) => {
     if (!targetAgency) {
       return res.status(404).json({
         success: false,
-        message: 'Target agency not found',
+        message: "Target agency not found",
       });
     }
 
     // Check if the target agency has enough resources
-    const hasEnoughResources = resource.every(requestedResource => {
-      const availableResource = targetAgency.resources.find(
-        resource => resource.name === requestedResource.name
-      );
-      return (
-        availableResource &&
-        availableResource.quantity >= requestedResource.quantity
-      );
-    });
 
-    if (!hasEnoughResources) {
-      return res.status(400).json({
-        success: false,
-        message: 'Not enough resources available for the request',
-      });
-    }
+    // Assuming resources is an object with properties name and quantity
+    const resources = await Resources.findById(targetAgency.resources._id);
 
+    for (let i = 0; i < resource.name.length; i++) {
+      const requestedResource = resource.name[i];
 
-    // Deduct the requested resources from the target agency
-    resource.forEach(requestedResource => {
-      const resourceIndex = targetAgency.resources.findIndex(
-        resource => resource.name === requestedResource.name
+      // Find the index of the requested resource in the resources array
+      const resourceIndex = resources.name.findIndex(
+        (name) => name === requestedResource
       );
+
       if (resourceIndex !== -1) {
-        targetAgency.resources[resourceIndex].quantity -= requestedResource.quantity;
+        // Check if the quantity is sufficient
+        if (resources.quantity[resourceIndex] < resource.quantity[i]) {
+          return res.status(400).json({
+            success: false,
+            message: "Resources needed are not in sufficient quantity",
+          });
+        }
       }
-    });
-
+    }
 
     // Create a new request document
     const newRequest = new Request({
@@ -61,20 +59,55 @@ exports.sendRequestToAgency = async (req, res) => {
       to: targetAgency._id, // Set the target agency
       from: requestingAgency._id, // Set the requesting agency
       resource,
-      status: 'Pending', // Set the status to 'Pending' by default
+      status: "Pending", // Set the status to 'Pending' by default
     });
 
     await newRequest.save();
 
     return res.status(200).json({
       success: true,
-      message: 'Request sent successfully',
+      message: "Request sent successfully",
+      newRequest: newRequest,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error',
+      error: error.message,
+      message: "Internal Server Error",
     });
   }
 };
+
+
+exports.allRequestsSend = async (req, res) => {
+  try {
+    const { agencyId } = req.body;
+
+    // Find the requesting agency
+    const requestingAgency = await Agency.findById(agencyId);
+    if (!requestingAgency) {
+      return res.status(404).json({
+        success: false,
+        message: "Agency not found",
+      });
+    }
+
+    const allRequests = await Request.find({ from: agencyId })
+      .populate("to")
+      .populate("from")
+      .exec();
+
+    return res.status(200).json({
+      success: true,
+      message: "All requests received Successfully",
+      allRequests,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error in allRequestSend",
+    });
+  }
+}
