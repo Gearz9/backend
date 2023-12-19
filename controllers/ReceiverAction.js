@@ -7,20 +7,23 @@ exports.receiverPendingRequests = async (req, res) => {
   try {
     const { agencyID } = req.body;
 
-    const requests = await Request.find({ to: agencyID, status: "Pending" });
+    if (!agencyID) {
+      return res.status(400).json({ message: 'Agency ID is required in the request body' });
+    }
+
+    const requests = await Request.find({ to: agencyID, status: 'Pending' });
 
     if (!requests || requests.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No pending requests found for the given agencyID" });
+      return res.status(404).json({ message: 'No pending requests found for the given agencyID' });
     }
 
     return res.status(200).json({ requests });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 ////////////////////////////////////////////////////////////////
 
 // Accept or reject a request and update resources accordingly
@@ -46,25 +49,23 @@ exports.receiverAction = async (req, res) => {
 
     // Taking next step as per actions
     if (action === "Accepted") {
-      for (let i = 0; i < request.resource.length; i++) {
-        const requestedResource = request.resource[i];
+      for (let i = 0; i < request.resource.name.length; i++) {
+        const requestedResource = request.resource.name[i];
 
         const resourceIndex = resources.name.findIndex(
           (name) => name === requestedResource.name
         );
 
         if (resourceIndex !== -1) {
-          if (resources.quantity[resourceIndex] >= requestedResource.quantity) {
-            resources.quantity[resourceIndex] -= requestedResource.quantity;
+          if (resources.quantity[resourceIndex] >= request.resource.quantity[i]) {
+            resources.quantity[resourceIndex] -= request.resource.quantity[i];
           } else {
             // Handling insufficient quantity
 
-            return res
-              .status(400)
-              .json({
-                success: false,
-                message: "Resources Needed are not in sufficient Qunatity",
-              });
+            return res.status(400).json({
+              success: false,
+              message: "Resources Needed are not in sufficient Qunatity",
+            });
           }
         }
       }
@@ -72,15 +73,15 @@ exports.receiverAction = async (req, res) => {
       // Update the request status to "Accepted"
       request.status = "Accepted";
     } else if (action === "Completed") {
-      for (let i = 0; i < request.resource.length; i++) {
-        const completedResource = request.resource[i];
+      for (let i = 0; i < request.resource.name.length; i++) {
+        const completedResource = request.resource.name[i];
 
         const resourceIndex = resources.name.findIndex(
-          (name) => name === completedResource.name
+          (name) => name === completedResource
         );
 
         if (resourceIndex !== -1) {
-          resources.quantity[resourceIndex] += completedResource.quantity;
+          resources.quantity[resourceIndex] += completedResource.request.resource.quantity[i];
         }
       }
 
@@ -104,25 +105,26 @@ exports.receiverAction = async (req, res) => {
   }
 };
 
-
-
 // reciever all requests history
 exports.allRequests = async (req, res) => {
   try {
     const { agencyID } = req.body;
 
     // Use populate to get detailed information about the requesting agency and resources
-      try{
-        const allRequests = await Request.find().populate({ from: agencyID, to: agencyID }).exec();
-        res.status(200).json({
-            success:true,
-            allRequests,
-        })
-    }catch(err){
-        res.status(500).json({
-            success:false,
-            message:err.message,
-        })
+    try {
+      const allRequests = await await Request.find({ to: agencyId })
+        .populate("to")
+        .populate("from")
+        .exec();
+      res.status(200).json({
+        success: true,
+        allRequests,
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: err.message,
+      });
     }
     return res.status(200).json({ success: true, allRequests });
   } catch (error) {
@@ -131,5 +133,4 @@ exports.allRequests = async (req, res) => {
   }
 };
 
-
-// 
+//
