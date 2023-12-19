@@ -11,9 +11,9 @@ const {getAllAgencies} = require('../controllers/testing');
 router.post("/sendOtp", sendOTP);
 router.post("/register", register);
 router.post("/login", login);
-router.get("/get-nearby", getNearby);
+router.post("/get-nearby", getNearby);
 router.post('/verifyOtp', verify);
-router.post('/send-request', sendRequestToAgency);
+// router.post('/send-request', sendRequestToAgency);
 router.post('/add-resource', addResource);
 router.get('/testing/getAllAgencies',getAllAgencies);
 
