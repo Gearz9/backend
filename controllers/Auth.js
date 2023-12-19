@@ -213,10 +213,16 @@ exports.register = async(req,res) => {
                 expires:new Date(Date.now()+ 3*24*60*60*1000),
                 httpOnly:true,
             }
-            res.cookie('token',token,options).status(200).json({
+            // res.cookie('token',token,options).status(200).json({
+            //     success:true,
+            //     token,
+            //     Agency,
+            //     message:'Logged in successfully',
+            // })
+            return res.status(200).json({
                 success:true,
-                token,
-                Agency,
+                token:token,
+                agency:Agency,
                 message:'Logged in successfully',
             })
         }
@@ -244,12 +250,14 @@ exports.verify = async(req,res) => {
         const {email,otp} = req.body;
         const recentOtp = await OTP.find({email}).sort({createdAt:-1}).limit(1);
         if(recentOtp.length === 0){
+            console.log("otp not found")
             return res.status(400).json({
                 success:false,
                 message:'Otp Not found',
             })
         }
         else if(otp != recentOtp[0].otp){
+            console.log("otp doent match")
             return res.status(400).json({
                 success:false,
                 message:'Otp doesnt match',

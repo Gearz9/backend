@@ -4,7 +4,7 @@ const router = express.Router()
 
 const { sendOTP,register,login,verify } = require('../controllers/Auth');
 const { getNearby } = require('../controllers/Nearby');
-const {sendRequestToAgency} = require('../controllers/RequestAgency');
+// const {sendRequestToAgency} = require('../controllers/RequestAgency');
 const {addResource} = require('../controllers/ResourceAdd');
 const {getAllAgencies} = require('../controllers/testing');
 
