@@ -35,10 +35,10 @@ exports.addResource = async (req, res) => {
 
     for (let i = 0; i < resourcesObject.name.length; i++) {
       if (resourcesObject.name[i] === resourceName) {
-        
         return res.status(400).json({
           success: false,
-          message: "Resource already exists for this agency. Go for Updating Reourses Quantity Please",
+          message:
+            "Resource already exists for this agency. Go for Updating Reourses Quantity Please",
         });
       }
     }
@@ -47,11 +47,10 @@ exports.addResource = async (req, res) => {
     resourcesObject.name.push(resourceName);
     resourcesObject.quantity.push(resourceQuantity);
 
-
     // Save the updated resources data
     await Resources.findByIdAndUpdate(resourcesObjectId, resourcesObject);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Resource added to the agency successfully",
       resource: resourcesData,
@@ -77,5 +76,54 @@ exports.addResource = async (req, res) => {
   }
 };
 
+exports.updateResource = async (req, res) => {
+  try {
+    const { agencyId, resourceName, resourceQuantity } = req.body;
+    const agencyData = await Agency.findById(agencyId);
 
-// exports.
+    if (!agencyData) {
+      return res.status(404).json({
+        success: false,
+        message: "Agency not found",
+      });
+    }
+
+    let resourcesObjectId = agencyData.resources._id;
+    let resourcesObject = await Resources.findById(resourcesObjectId);
+
+    // finding resources object id and updating it
+
+    for (let i = 0; i < resourcesObject.name.length; i++) {
+      if (resourcesObject.name[i] === resourceName) {
+        resourcesObject.quantity[i] += resourceQuantity;
+
+        break;
+      }
+    }
+
+    await Resources.findByIdAndUpdate(resourcesObjectId, resourcesObject);
+
+    return res.status(201).json({
+      success: true,
+      message: "Updated Resources  of the agency successfully",
+    });
+  } catch (error) {
+    console.error("Error UPDATING a resource of the agency:", error);
+
+    if (error.name === "ValidationError") {
+      // Handle validation errors
+      res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: error.errors,
+      });
+    } else {
+      // Handle other errors
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }
+};
