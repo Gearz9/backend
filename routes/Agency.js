@@ -19,7 +19,7 @@ const {
 router.post("/sendOtp", sendOTP);
 router.post("/register", register);
 router.post("/login", login);
-router.get("/get-nearby", getNearby);
+router.post("/get-nearby", getNearby);
 router.post("/verifyOtp", verify);
 // router.post('/send-request', sendRequestToAgency);
 router.post("/receiver-pending-requests", receiverPendingRequests);
