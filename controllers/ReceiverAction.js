@@ -104,19 +104,30 @@ exports.receiverAction = async (req, res) => {
   }
 };
 
+
+
 // reciever all requests history
 exports.allRequests = async (req, res) => {
   try {
     const { agencyID } = req.body;
 
-    // Here we need to populate the object ids to get all information
-
-    // !-------- Changes NEEDED here ----------------!
-    const allRequests = await Request.find({ to: agencyID });
-
+    // Use populate to get detailed information about the requesting agency and resources
+      try{
+        const allRequests = await Request.find().populate({ from: agencyID, to: agencyID }).exec();
+        res.status(200).json({
+            success:true,
+            allRequests,
+        })
+    }catch(err){
+        res.status(500).json({
+            success:false,
+            message:err.message,
+        })
+    }
     return res.status(200).json({ success: true, allRequests });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
