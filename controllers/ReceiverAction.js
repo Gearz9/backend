@@ -8,19 +8,23 @@ exports.receiverPendingRequests = async (req, res) => {
     const { agencyID } = req.body;
 
     if (!agencyID) {
-      return res.status(400).json({ message: 'Agency ID is required in the request body' });
+      return res
+        .status(400)
+        .json({ message: "Agency ID is required in the request body" });
     }
 
-    const requests = await Request.find({ to: agencyID, status: 'Pending' });
+    const requests = await Request.find({ to: agencyID, status: "Pending" });
 
     if (!requests || requests.length === 0) {
-      return res.status(404).json({ message: 'No pending requests found for the given agencyID' });
+      return res
+        .status(404)
+        .json({ message: "No pending requests found for the given agencyID" });
     }
 
     return res.status(200).json({ requests });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -42,22 +46,23 @@ exports.receiverAction = async (req, res) => {
 
     // get the resources id of the receiving agency
     const receiver_resources_id = (await Agency.findById(receiver_id))
-      ?.resources;
+      ?.resources._id;
 
     // finding the resources object in the db
     const resources = await Resources.findById(receiver_resources_id);
 
+    console.log("Resources Object : ", resources);
     // Taking next step as per actions
     if (action === "Accepted") {
       for (let i = 0; i < request.resource.name.length; i++) {
         const requestedResource = request.resource.name[i];
-
         const resourceIndex = resources.name.findIndex(
-          (name) => name === requestedResource.name
+          (name) => name === requestedResource
         );
-
         if (resourceIndex !== -1) {
-          if (resources.quantity[resourceIndex] >= request.resource.quantity[i]) {
+          if (
+            resources.quantity[resourceIndex] >= request.resource.quantity[i]
+          ) {
             resources.quantity[resourceIndex] -= request.resource.quantity[i];
           } else {
             // Handling insufficient quantity
@@ -81,7 +86,8 @@ exports.receiverAction = async (req, res) => {
         );
 
         if (resourceIndex !== -1) {
-          resources.quantity[resourceIndex] += completedResource.request.resource.quantity[i];
+          console.log("i am HERE ................. here");
+          resources.quantity[resourceIndex] += request.resource.quantity[i];
         }
       }
 
@@ -96,6 +102,7 @@ exports.receiverAction = async (req, res) => {
     // updating the request status in the DB
     await Request.findByIdAndUpdate(request_id, request);
     // Update the Resources availability of the receiver Agency in the DB
+
     await Resources.findByIdAndUpdate(receiver_resources_id, resources);
 
     return res.status(200).json({ success: true });
@@ -112,7 +119,7 @@ exports.allRequests = async (req, res) => {
 
     // Use populate to get detailed information about the requesting agency and resources
     try {
-      const allRequests = await await Request.find({ to: agencyId })
+      const allRequests = await await Request.find({ to: agencyID })
         .populate("to")
         .populate("from")
         .exec();
