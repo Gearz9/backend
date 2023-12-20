@@ -1,4 +1,5 @@
 const agency = require('../models/AgencySchema');
+const Resources = require('../models/ResourcesSchema');
 const OTP  = require('../models/OTPSchema');
 const otpGenerator = require('otp-generator');
 const bcrypt = require('bcrypt');
@@ -137,7 +138,7 @@ exports.register = async(req,res) => {
      const hashedPassword = await bcrypt.hash(password,10);
      //store password
      
-    //  const resourcesDataReference = new Resources();
+     const resourcesDataReference = new Resources();
 
  
      const Agency = await agency.create({
@@ -153,7 +154,7 @@ exports.register = async(req,res) => {
             coordinates:[parseFloat(lat),parseFloat(lng)]
         },
          address:address,
-        //  resources: resourcesDataReference._id,
+         resources: resourcesDataReference._id,
      });
  
      return res.status(200).json({

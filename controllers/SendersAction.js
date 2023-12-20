@@ -2,14 +2,22 @@
 const Request = require("../models/RequestSchema");
 const Agency = require("../models/AgencySchema");
 const Resources = require("../models/ResourcesSchema");
-
+const { default: mongoose } = require("mongoose");
+const{ObjectId} = require('mongodb');
 
 // Assuming you have the necessary imports for Agency, Resources, and Request
 
 exports.sendRequestToAgency = async (req, res) => {
   try {
-    const { selectedAgencyId, userId, lat, lng, resource } = req.body;
+    let { selectedAgencyId, userId, lat, lng ,resource} = req.body;
 
+    // console.log("first " + selectedAgencyId + " second " + userId + " third " + lat + " fourth " + lng + " fifth " + resource)
+    // console.log("REsource" , resource.name[0] , resource.quantity[0])
+
+    // console.log("userId" , userId)
+
+    // const selectedAgencyId1 =   mongoose.Types.ObjectId(selectedAgencyId);
+    
     // Find the requesting agency.
     const requestingAgency = await Agency.findById(userId);
     if (!requestingAgency) {
@@ -29,8 +37,6 @@ exports.sendRequestToAgency = async (req, res) => {
     }
 
     // Check if the target agency has enough resources
-
-    // Assuming resources is an object with properties name and quantity
     const resources = await Resources.findById(targetAgency.resources._id);
 
     for (let i = 0; i < resource.name.length; i++) {
@@ -62,6 +68,7 @@ exports.sendRequestToAgency = async (req, res) => {
       status: "Pending", // Set the status to 'Pending' by default
     });
 
+    // Save the new request
     await newRequest.save();
 
     return res.status(200).json({
@@ -78,6 +85,7 @@ exports.sendRequestToAgency = async (req, res) => {
     });
   }
 };
+
 
 
 exports.allRequestsSend = async (req, res) => {
