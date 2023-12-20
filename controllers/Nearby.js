@@ -12,7 +12,7 @@ exports.getNearby = async (req, res) => {
             coordinates: [parseFloat(lng), parseFloat(lat)],
           },
           distanceField: "distance",
-          maxDistance: 1000000, // Maximum distance in meters
+          maxDistance: 10000000000000, // Maximum distance in meters
           spherical: true,
         },
       },
