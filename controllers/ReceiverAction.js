@@ -13,7 +13,10 @@ exports.receiverPendingRequests = async (req, res) => {
         .json({ message: "Agency ID is required in the request body" });
     }
 
-    const requests = await Request.find({ to: agencyID, status: "Pending" });
+    const requests = await Request.find({ to: agencyID, status: "Pending" })
+      .populate("to")
+      .populate("from")
+      .exec();
 
     if (!requests || requests.length === 0) {
       return res
