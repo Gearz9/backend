@@ -6,7 +6,7 @@ const Resources = require("../models/ResourcesSchema");
 exports.receiverPendingRequests = async (req, res) => {
   try {
     const { agencyID } = req.body;
-
+    console.log("Agency ID : ", agencyID);
     if (!agencyID) {
       return res
         .status(400)
